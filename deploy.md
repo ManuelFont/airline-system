@@ -1,153 +1,155 @@
-DESPLIEGUE DEL SERVIDOR Y LOS CLIENTES EN PCS SEPARADAS
+# DEPLOYING THE SERVER AND CLIENTS ON SEPARATE PCS
 
-Esta guía inicia el backend (server, rabbitmq y flightReports) en una PC, el cliente original en otra y el cliente administrador en una tercera. Las PCs deben estar en la misma red, la PC del servidor debe aceptar conexiones por los puertos 5100 y 5101, y cada comando debe ejecutarse desde la raíz del repositorio de la aplicación.
+This guide starts the backend (`server`, `rabbitmq`, and `flightReports`) on one PC, the original client on another, and the administrator client on a third. The PCs must be on the same network, the server PC must allow connections through ports 5100 and 5101, and each command must be executed from the application repository root.
 
-PC DEL SERVIDOR
+## SERVER PC
 
 ```bash
 cp .env.server.template .env
 ```
 
-Crea la configuración privada del backend a partir de la plantilla.
+Creates the backend’s private configuration from the template.
 
 ```bash
-ipconfig getifaddr en0 #mac
-ipconfig #windows
+ipconfig getifaddr en0 # macOS
+ipconfig # Windows
 ```
 
-Muestra la IP local que deberá usar el cliente.
+Displays the local IP address that the clients must use.
 
 ```bash
 nano .env
 ```
 
-Edita los puertos, credenciales de RabbitMQ y la IP del servidor externo de reportes de usuarios.
+Edit the ports, RabbitMQ credentials, and the IP address of the external user reports server.
 
 ```bash
 docker compose -f compose.server.yaml up -d rabbitmq
 ```
 
-Inicia RabbitMQ en segundo plano.
-La interfaz de RabbitMQ queda disponible en [http://localhost:15672](http://localhost:15672).
+Starts RabbitMQ in the background.
+
+The RabbitMQ interface is available at [http://localhost:15672](http://localhost:15672).
 
 ```bash
 docker compose -f compose.server.yaml up -d --build flight-report-server
 ```
 
-Construye e inicia el primer worker de reportes de vuelos con el nombre flight-report-worker-1.
+Builds and starts the first flight reports worker, named `flight-report-worker-1`.
 
-WORKERS DE REPORTES DE VUELOS
-El servicio iniciado con el backend funciona como el primer worker. Los siguientes comandos crean dos instancias adicionales del mismo consumidor.
+## FLIGHT REPORT WORKERS
+
+The service started alongside the backend operates as the first worker. The following commands create two additional instances of the same consumer.
 
 ```bash
 docker compose -f compose.server.yaml run -d --rm --name flight-report-worker-2 flight-report-server
 ```
 
-Inicia el segundo worker en segundo plano.
+Starts the second worker in the background.
 
 ```bash
 docker compose -f compose.server.yaml run -d --rm --name flight-report-worker-3 flight-report-server
 ```
 
-Inicia el tercer worker en segundo plano.
+Starts the third worker in the background.
 
-RabbitMQ entrega cada mensaje a un solo worker. El valor prefetchCount en 1 permite que cada worker mantenga un único reporte pendiente.
+RabbitMQ delivers each message to a single worker. Setting `prefetchCount` to `1` allows each worker to handle only one pending report at a time.
 
 ```bash
 docker logs -f flight-report-worker-1
 ```
 
-Muestra los logs del primer worker en una terminal.
+Displays the first worker’s logs in a terminal.
 
 ```bash
 docker logs -f flight-report-worker-2
 ```
 
-Muestra los logs del segundo worker en otra terminal.
+Displays the second worker’s logs in another terminal.
 
 ```bash
 docker logs -f flight-report-worker-3
 ```
 
-Muestra los logs del tercer worker en otra terminal.
+Displays the third worker’s logs in another terminal.
 
 ```bash
 docker compose -f compose.server.yaml run --rm --service-ports server
 ```
 
-Inicia el servidor principal de forma interactiva y publica sus puertos TCP y WebSocket.
+Starts the main server interactively and publishes its TCP and WebSocket ports.
 
-PC DEL CLIENTE
+## CLIENT PC
 
 ```bash
 cp .env.client.template .env
 ```
 
-Crea la configuración privada del cliente a partir de su plantilla.
+Creates the client’s private configuration from its template.
 
 ```bash
 nano .env
 ```
 
-Asigna a SERVER_HOST la IP obtenida en la PC del servidor y conservar SERVER_PORT en 5100.
+Set `SERVER_HOST` to the IP address obtained on the server PC and keep `SERVER_PORT` set to `5100`.
 
 ```bash
 docker compose -f compose.client.yaml build client
 ```
 
-Construye la imagen del cliente original.
+Builds the original client image.
 
 ```bash
 docker compose -f compose.client.yaml run --rm client
 ```
 
-Inicia el cliente interactivo y elimina su contenedor cuando finaliza.
+Starts the interactive client and removes its container when it exits.
 
-PC DEL CLIENTE ADMINISTRADOR
+## ADMINISTRATOR CLIENT PC
 
 ```bash
 cp .env.client-admin.template .env
 ```
 
-Crea la configuración privada del cliente administrador a partir de su template.
+Creates the administrator client’s private configuration from its template.
 
 ```bash
 nano .env
 ```
 
-Asigna a SERVER_HOST la IP de la PC del servidor y conserva los puertos 5100 y 5101.
+Set `SERVER_HOST` to the server PC’s IP address and keep ports `5100` and `5101` unchanged.
 
 ```bash
 docker compose -f compose.client-admin.yaml build client-admin
 ```
 
-Construye la imagen del cliente administrador.
+Builds the administrator client image.
 
 ```bash
 docker compose -f compose.client-admin.yaml run --rm client-admin
 ```
 
-Inicia el cliente administrador interactivo y elimina su contenedor cuando finaliza.
+Starts the interactive administrator client and removes its container when it exits.
 
-PC DEL SERVIDOR DE REPORTES DE USUARIOS
+## USER REPORTS SERVER PC
 
-Esta aplicación expone los endpoints gRPC y REST usados por el servidor principal. Su IP local debe asignarse a USER_REPORT_HOST en el archivo .env de la PC del servidor principal.
+This application exposes the gRPC and REST endpoints used by the main server. Its local IP address must be assigned to `USER_REPORT_HOST` in the `.env` file on the main server PC.
 
 ```bash
 cp .env.user-report.template .env
 ```
 
-Crea la configuración privada del servidor de reportes de usuarios.
+Creates the user reports server’s private configuration.
 
 ```bash
-ipconfig getifaddr en0 #mac
-ipconfig #windows
+ipconfig getifaddr en0 # macOS
+ipconfig # Windows
 ```
 
-Muestra la IP local que debe usar el servidor principal.
+Displays the local IP address that the main server must use.
 
 ```bash
 docker compose -f compose.user-report.yaml up -d --build user-report-server
 ```
 
-Construye e inicia el servidor de reportes de usuarios en segundo plano.
+Builds and starts the user reports server in the background.
