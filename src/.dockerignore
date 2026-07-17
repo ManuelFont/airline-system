@@ -1,0 +1,48 @@
+# ── Archivo .dockerignore ─────────────────────────────────────────────
+# Docker no enviará al demonio (daemon) ningún archivo que coincida
+# con estos patrones. Esto acelera el build y reduce el tamaño del contexto.
+# El contexto de build es la carpeta src/ (definido en compose.yaml).
+
+# Excluye archivos de editor/IDE
+**/.vs
+**/.vscode
+**/.idea
+**/.project
+**/.settings
+
+# Excluye carpetas de compilación y objetos temporales
+**/bin
+**/obj
+
+# Excluye archivos de control de versiones
+**/.git
+**/.gitignore
+
+# Excluye archivos de Docker (no necesarios dentro del build)
+**/.dockerignore
+**/.env
+**/docker-compose*
+**/Dockerfile*
+
+# Excluye configuraciones locales y secretos
+**/secrets.dev.yaml
+**/values.dev.yaml
+
+# Excluye node_modules por si acaso (aunque esto es .NET)
+**/node_modules
+**/npm-debug.log
+
+# Excluye otros archivos específicos
+**/azds.yaml
+**/.toolstarget
+**/*.*proj.user
+**/*.dbmdl
+**/*.jfm
+
+# Excluye documentación y ejemplos (no necesarios en runtime)
+LICENSE
+README.md
+
+# Excluye imágenes de ejemplo y código de clase (no son parte de la app)
+**/example-images
+**/codigo-clase

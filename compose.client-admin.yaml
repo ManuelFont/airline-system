@@ -1,0 +1,10 @@
+services:
+  client-admin:
+    container_name: socket-testing-client-admin
+    build:
+      context: ./src
+      dockerfile: ClientAdmin/Dockerfile
+    env_file:
+      - .env
+    stdin_open: true
+    tty: true

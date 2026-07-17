@@ -1,0 +1,52 @@
+services:
+  server:
+    container_name: socket-testing-server
+    build:
+      context: ./src
+      dockerfile: Server/Dockerfile
+    environment:
+      SERVER_PORT: ${SERVER_PORT}
+      WEBSOCKET_PORT: ${WEBSOCKET_PORT}
+      UPLOADS_PATH: ${UPLOADS_PATH}
+      USER_REPORT_HOST: ${USER_REPORT_HOST}
+      USER_REPORT_PORT: ${USER_REPORT_PORT}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+      - "${WEBSOCKET_PORT}:${WEBSOCKET_PORT}"
+    volumes:
+      - ./uploads:/app/uploads
+    stdin_open: true
+    tty: true
+    depends_on:
+      - rabbitmq
+
+  flight-report-server:
+    container_name: flight-report-worker-1
+    build:
+      context: ./src
+      dockerfile: FlightReportServer/Dockerfile
+    environment:
+      REPORTS_PATH: ${REPORTS_PATH}
+      RABBITMQ_HOST: ${RABBITMQ_HOST}
+      RABBITMQ_PORT: ${RABBITMQ_PORT}
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+    volumes:
+      - ./reports/flight:/app/reports
+    stdin_open: true
+    tty: true
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    container_name: socket-testing-rabbitmq
+    image: rabbitmq:4-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "15672:15672"

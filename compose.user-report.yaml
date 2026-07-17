@@ -1,0 +1,13 @@
+services:
+  user-report-server:
+    container_name: socket-testing-user-report-server
+    build:
+      context: ./src
+      dockerfile: UserReportServer/Dockerfile
+    environment:
+      USER_REPORT_PORT: ${USER_REPORT_PORT}
+      REPORTS_PATH: ${REPORTS_PATH}
+    ports:
+      - "${USER_REPORT_PORT}:${USER_REPORT_PORT}"
+    volumes:
+      - ./reports/user:/app/reports

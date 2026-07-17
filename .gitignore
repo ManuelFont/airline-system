@@ -1,0 +1,74 @@
+codigo-clase/
+
+uploads/*
+reports/*
+
+documentation.txt
+
+## --- Operating System Files ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+## --- .NET / C# ---
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+
+# MSBuild / User-specific files
+*.user
+*.userosscache
+*.sln.docuser
+*.suo
+*.userprefs
+
+# Roslyn / Analyzers
+.analyzerdata
+
+## --- JetBrains Rider ---
+.idea/
+*.sln.iml
+# Rider specific project settings (usually safe to ignore)
+.idea/.idea.*/.idea/indexLayout.xml
+.idea/.idea.*/.idea/projectSettingsUpdater.xml
+
+## --- NuGet / Packages ---
+# Local package folders
+*.nupkg
+**/packages/*
+!**/packages/build/
+project.lock.json
+project.assets.json
+
+## --- AI Tools (Copilot / Gemini / AI CLI) ---
+# Ignore local AI chat history or context caches
+skills-lock.json
+AGENTS.md
+.agents/
+.copilot/
+.gemini/
+.ai-chat/
+.chat-history/
+gemini-cli.log
+copilot-debug.log
+
+## --- Class exercise code (not part of solution) ---
+codigo-clase/
+
+## --- Environment & Secrets ---
+# Keep your API keys and local secrets safe
+.env
+.env.local
+.env.*.local
+appsettings.Development.json
+appsettings.Local.json
+*.pfx
+*.certificate
